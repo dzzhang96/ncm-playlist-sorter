@@ -17,6 +17,7 @@ font_name = input(
 if len(font_name) == 0:
     font_name = "PingFang"
 font = ImageDraw2.Font('black', font_name, 60)
+font_small = ImageDraw2.Font('black', font_name, 30)
 
 
 def get_pixel_width(string):
@@ -36,7 +37,10 @@ datalist = netease.playlist_detail(id)
 
 for song in datalist:
     new_song = Song()
+    # print(song)
+    # input()
     new_song.name = song["name"]
+    new_song.album = song["album"]["name"]
     artists = []
     for artist in song["artists"]:
         artists.append(artist["name"])
@@ -47,21 +51,26 @@ for song in datalist:
 playlist.sort(key=lambda x: x.name_size)
 
 max_width = 0
-result = ""
+results = []
 
 for item in playlist:
     print("Text = %s, size = %d" % (item.name, item.name_size))
-    result += "%s - %s\n" % (item.name, item.artist)
+    results.append(item.name)
+    results.append("%s - %s\n" % (item.artist, item.album))
     if item.name_size > max_width:
         max_width = item.name_size
 
-result_image = Image.new(
-    'RGB', (int(max_width * safe_ratio), len(playlist) * (60 + padding)), color="white")
-result_draw = ImageDraw2.Draw(result_image)
-
 input("歌曲数目: %d。按回车生成图片。" % len(playlist))
 
-result_draw.text((padding, padding), result, font=font)
+result_image = Image.new(
+    'RGB', (1080, len(playlist) * (100 + padding)), color="white")
+result_draw = ImageDraw2.Draw(result_image)
+
+for i in range(1, len(playlist)):
+    result_draw.text((padding, padding + 100 * i), results[2 * i], font=font)
+    result_draw.text((padding, padding + 100 * i + 70),
+                     results[2 * i + 1], font=font_small)
+
 result_image.show()
 
 file_name = input("输入文件名来保存 PNG 文件 >>>")

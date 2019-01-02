@@ -1,6 +1,7 @@
 class Song:
     name = ""
     artist = ""
+    album = ""
     name_size = 0
 
     def compare(self, x):
