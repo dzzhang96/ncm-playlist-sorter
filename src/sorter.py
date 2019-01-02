@@ -13,7 +13,7 @@ padding = 9
 safe_ratio = 1.4
 
 font_name = input(
-    "请输入用于判定的字体名称：Windows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Helvetica >>> ")
+    "请输入用于判定的字体名称：Windows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti >>> ")
 if len(font_name) == 0:
     font_name = "PingFang"
 font = ImageDraw2.Font('black', font_name, 60)
@@ -30,7 +30,7 @@ def get_pixel_width(string):
 
 
 id = input("请输入歌单 ID 或 URL >>>").replace(
-    "https://music.163.com/#/playlist?id=", "")
+    "https://music.163.com/#/playlist?id=", "").replace("https://music.163.com/#/my/m/music/playlist?id=", "")
 
 datalist = netease.playlist_detail(id)
 
@@ -61,8 +61,7 @@ result_draw = ImageDraw2.Draw(result_image)
 
 input("歌曲数目: %d。按回车生成图片。" % len(playlist))
 
-output_font = ImageDraw2.Font('black', "PingFang.ttc", 60)
-result_draw.text((padding, padding), result, font=output_font)
+result_draw.text((padding, padding), result, font=font)
 result_image.show()
 
 file_name = input("输入文件名来保存 PNG 文件 >>>")
