@@ -63,13 +63,20 @@ for item in playlist:
 input("歌曲数目: %d。按回车生成图片。" % len(playlist))
 
 result_image = Image.new(
-    'RGB', (1080, len(playlist) * (100 + padding)), color="white")
+    'RGB', (1080, len(playlist) * (130)), color="white")
 result_draw = ImageDraw2.Draw(result_image)
 
-for i in range(1, len(playlist)):
-    result_draw.text((padding, padding + 100 * i), results[2 * i], font=font)
-    result_draw.text((padding, padding + 100 * i + 70),
+frame_width = 1080
+
+for i in range(0, len(playlist)):
+    result_draw.text((padding * 5, padding + 130 * i),
+                     results[2 * i], font=font)
+    result_draw.text((padding * 5, padding + 130 * i + 80),
                      results[2 * i + 1], font=font_small)
+
+    result_draw.line((padding * 5, padding + 130 * i + 120),
+                      (frame_width, padding + 130 * i + 120), 'gray')
+
 
 result_image.show()
 
