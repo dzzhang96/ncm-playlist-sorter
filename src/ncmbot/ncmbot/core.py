@@ -31,28 +31,8 @@ __all__ = [
 ]
 
 
-def make_cookie(self, name, value):
-    return http.cookiejar.Cookie(
-        version=0,
-        name=name,
-        value=value,
-        port=None,
-        port_specified=False,
-        domain="music.163.com",
-        domain_specified=True,
-        domain_initial_dot=False,
-        path="/",
-        path_specified=True,
-        secure=False,
-        expires=None,
-        discard=False,
-        comment=None,
-        comment_url=None,
-        rest=None,
-    )
-
-
 class NCloudBot(object):
+    MUSIC_U = ""
     """
     The :class:`NCloudBot` object. It carries out all functionality of
     NCloudBot
@@ -104,18 +84,22 @@ class NCloudBot(object):
         # 私人 FM （需要登录）
         'PERSONAL_FM': '/weapi/v1/radio/get',
         # 添加歌曲到歌单
-        'ADD_SONG': '/weapi/playlist/tracks?op=add&pid=%s&tracks=%s',
+        'ADD_SONG': '/weapi/playlist/manipulate/tracks?csrf_token=',
         # 创建歌单
-        'CREATE_LIST': '/weapi/playlist/create?csrf_token=%s'
+        'CREATE_LIST': '/weapi/playlist/create?csrf_token='
     }
 
     __NETEAST_HOST = 'http://music.163.com'
 
-    def __init__(self):
+    def set_MUSIC_U(self, u):
+        self.MUSIC_U = u
+
+    def __init__(self, MUSIC_U=""):
         self.method = None
         self.data = {}
         self.params = {}
         self.response = Response()
+        self.MUSIC_U = MUSIC_U
 
     def __repr__(self):
         return '<NCloudBot [%s]>' % (self.method)
@@ -138,7 +122,7 @@ class NCloudBot(object):
             'keep-alive',
             'Content-Type':
             'application/x-www-form-urlencoded',
-            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.2.1;",
+            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.4.1; MUSIC_U=%s; channel=netease" % self.MUSIC_U,
             'Origin': 'https://music.163.com',
             'Referer':
             'http://music.163.com',
@@ -154,7 +138,7 @@ class NCloudBot(object):
         headers = {
             'Referer':
             self.__NETEAST_HOST,
-            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.2.1;",
+            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.4.1; MUSIC_U=%s; channel=netease" % self.MUSIC_U,
             'Content-Type':
             'application/x-www-form-urlencoded',
             'User-Agent':
@@ -192,6 +176,8 @@ class NCloudBot(object):
                 data = encrypted_request(self.data)
 
                 req = self._get_webapi_requests()
+                print("Now headers = ")
+                print(req.headers)
                 _url = self.__NETEAST_HOST + self._METHODS[self.method]
 
                 if self.method in ('USER_DJ', 'USER_FOLLOWS', 'USER_EVENT'):
@@ -200,8 +186,8 @@ class NCloudBot(object):
                 if self.method in ('LYRIC', 'MUSIC_COMMENT'):
                     _url = _url % self.params['id']
 
-                if self.method in ('CREATE_LIST'):
-                    _url = _url % self.params['csrf_token']
+                # if self.method in ('CREATE_LIST'):
+                #     _url = _url % self.params['csrf_token']
 
                 # print(self.params)
                 # # input()
@@ -556,6 +542,13 @@ def personal_fm():
 def add_song():
     r = NCloudBot()
     r.method = 'ADD_SONG'
+    r.data = {
+        'op': 'add',
+        'pid': '2569303529',
+        'trackIds': '[460, 48943]'
+    }
+    r.send()
+    return r.response
 
 
 class NCloudBotException(Exception):

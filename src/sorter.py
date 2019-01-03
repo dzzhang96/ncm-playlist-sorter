@@ -100,6 +100,7 @@ print(json.dumps(dict(resp.headers)))
 print(resp.content.decode())
 
 login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
+MUSIC_U = login_resp.split('MUSIC_U=')[1].split(';')[0]
 
 
 user_token = login_resp.split('__csrf=')[1].split(';')[0]
@@ -108,16 +109,19 @@ user_token = login_resp.split('__csrf=')[1].split(';')[0]
 
 input("token = %s" % user_token)
 
+print(add_song().content.decode())
+input()
 
 # print(personal_fm().content.decode())
 # input()
 
 playlist_name = input("请输入要创建的新歌单名 >>>")
 
-bot = NCloudBot()
+input(MUSIC_U)
+bot = NCloudBot(MUSIC_U)
 bot.method = 'CREATE_LIST'
 bot.params = {"csrf_token": user_token}
-bot.data = {"name": str(playlist_name), "csrf_token": ""}
+bot.data = {"name": str(playlist_name), "csrf_token": user_token}
 bot.send()
 print(bot.response.content.decode())
 
