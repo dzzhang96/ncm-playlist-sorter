@@ -17,7 +17,7 @@ padding = 9
 safe_ratio = 1.4
 
 font_name = input(
-    "请输入用于判定的字体名称：Windows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti >>>")
+    "请输入用于判定的字体名称：\nWindows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n>>>")
 if len(font_name) == 0:
     font_name = "PingFang"
 font = ImageDraw2.Font('black', font_name, 60)
@@ -45,6 +45,7 @@ for song in datalist:
     # input()
     new_song.name = song["name"]
     new_song.album = song["album"]["name"]
+    new_song.id = song["id"]
     artists = []
     for artist in song["artists"]:
         artists.append(artist["name"])
@@ -54,17 +55,26 @@ for song in datalist:
 
 playlist.sort(key=lambda x: x.name_size)
 
-max_width = 0
-results = []
+track_ids = []
+
 
 for item in playlist:
-    print("Text = %s, size = %d" % (item.name, item.name_size))
-    results.append(item.name)
-    results.append("%s - %s\n" % (item.artist, item.album))
-    if item.name_size > max_width:
-        max_width = item.name_size
+    print("歌曲名称 = %s, 相对长度 = %d" % (item.name, item.name_size))
+    # results.append(item.name)
+    # results.append("%s - %s\n" % (item.artist, item.album))
+    # if item.name_size > max_width:
+    #     max_width = item.name_size
 
-input("歌曲数目: %d。按回车来登录网易云账号并进行同步。" % len(playlist))
+controller = input("歌曲数目: %d。按回车来登录网易云账号并进行同步。输入 I/i 来倒序排列歌曲。" % len(playlist))
+
+if controller != 'I' and controller != 'i':
+    playlist.reverse()
+
+
+for p in playlist:
+    track_ids.append(str(p.id))
+
+trackIdString = '[' + ', '.join(track_ids) + ']'
 
 # result_image = Image.new(
 #    'RGB', (1080, len(playlist) * (130)), color = "white")
@@ -96,8 +106,8 @@ login_password = input("输入密码 >>>")
 bot, resp = login(login_password, phone=login_name)
 
 
-print(json.dumps(dict(resp.headers)))
-print(resp.content.decode())
+# print(json.dumps(dict(resp.headers)))
+# print(resp.content.decode())
 
 login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
 MUSIC_U = login_resp.split('MUSIC_U=')[1].split(';')[0]
@@ -107,22 +117,37 @@ user_token = login_resp.split('__csrf=')[1].split(';')[0]
 
 # user_token = 'fakefakefake'
 
-input("token = %s" % user_token)
-
-print(add_song().content.decode())
-input()
+# input("token = %s" % user_token)
 
 # print(personal_fm().content.decode())
 # input()
 
 playlist_name = input("请输入要创建的新歌单名 >>>")
 
-input(MUSIC_U)
+# input(MUSIC_U)
 bot = NCloudBot(MUSIC_U)
 bot.method = 'CREATE_LIST'
 bot.params = {"csrf_token": user_token}
 bot.data = {"name": str(playlist_name), "csrf_token": user_token}
 bot.send()
-print(bot.response.content.decode())
 
-print(resp)
+result = json.loads(bot.response.content.decode())
+
+if result['code'] != 200:
+    print("创建歌单失败。")
+    exit(1)
+
+new_playlist_id = result['id']
+
+final_result = add_song(str(new_playlist_id), trackIdString, MUSIC_U)
+
+final_response = json.loads(final_result.content.decode())['code']
+
+# print(resp)
+
+if final_response == 200:
+    print("成功！")
+    exit(0)
+else:
+    print("哪里不太对的样子")
+    exit(-1)

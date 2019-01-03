@@ -176,8 +176,8 @@ class NCloudBot(object):
                 data = encrypted_request(self.data)
 
                 req = self._get_webapi_requests()
-                print("Now headers = ")
-                print(req.headers)
+                # print("Now headers = ")
+                # print(req.headers)
                 _url = self.__NETEAST_HOST + self._METHODS[self.method]
 
                 if self.method in ('USER_DJ', 'USER_FOLLOWS', 'USER_EVENT'):
@@ -197,9 +197,9 @@ class NCloudBot(object):
                     resp = req.get(_url)
                 else:
                     resp = req.post(_url, data=data)
-                    print("Posted data:")
-                    print(self.data)
-                print("url = " + _url)
+                    # print("Posted data:")
+                    # print(self.data)
+                # print("url = " + _url)
                 # print("Cookies are:")
                 # print(self.req.cookies.values)
                 # input()
@@ -539,13 +539,13 @@ def personal_fm():
     return r.response
 
 
-def add_song():
-    r = NCloudBot()
+def add_song(pid, trackIds, UID=""):
+    r = NCloudBot(UID)
     r.method = 'ADD_SONG'
     r.data = {
         'op': 'add',
-        'pid': '2569303529',
-        'trackIds': '[460, 48943]'
+        'pid': pid,
+        'trackIds': trackIds
     }
     r.send()
     return r.response
