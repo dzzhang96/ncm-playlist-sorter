@@ -64,49 +64,61 @@ for item in playlist:
     if item.name_size > max_width:
         max_width = item.name_size
 
-input("歌曲数目: %d。按回车生成图片。" % len(playlist))
+input("歌曲数目: %d。按回车来登录网易云账号并进行同步。" % len(playlist))
 
-result_image = Image.new(
-    'RGB', (1080, len(playlist) * (130)), color="white")
-result_draw = ImageDraw2.Draw(result_image)
+# result_image = Image.new(
+#    'RGB', (1080, len(playlist) * (130)), color = "white")
+# result_draw = ImageDraw2.Draw(result_image)
 
-frame_width = 1080
+# frame_width = 1080
 
-for i in range(0, len(playlist)):
-    result_draw.text((padding * 5, padding + 130 * i),
-                     results[2 * i], font=font)
-    result_draw.text((padding * 5, padding + 130 * i + 80),
-                     results[2 * i + 1], font=font_small)
+# for i in range(0, len(playlist)):
+#    result_draw.text((padding * 5, padding + 130 * i),
+#                     results[2 * i], font=font)
+#    result_draw.text((padding * 5, padding + 130 * i + 80),
+#                     results[2 * i + 1], font=font_small)
 
-    result_draw.line((padding * 5, padding + 130 * i + 120),
-                     (frame_width, padding + 130 * i + 120), 'gray')
+#    result_draw.line((padding * 5, padding + 130 * i + 120),
+#                     (frame_width, padding + 130 * i + 120), 'gray')
 
 
-result_image.show()
+# result_image.show()
 
 # file_name = input("输入文件名来保存 PNG 文件 >>>")
 # result_image.save("%s.png" % file_name)
 
-login_name = input("输入手机号或 Email 来登录 >>>")
+login_name = input("输入手机号码来登录 >>>")
 login_password = input("输入密码 >>>")
 
-if '@' in login_name:
-    bot = login(login_password, email=login_name)
-else:
-    bot = login(login_password, phone=login_name)
+# if '@' in login_name:
+#     bot, resp = login(login_password, email=login_name)
+# else:
+bot, resp = login(login_password, phone=login_name)
 
-# print(bot.content.decode())
 
-login_resp = json.loads(str(bot.content.decode()))
+print(json.dumps(dict(resp.headers)))
+print(resp.content.decode())
 
-user_token = json.loads(login_resp['bindings'][1]['tokenJsonStr'])[
-    'openid'].lower()
-input(user_token)
+login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
 
+
+user_token = login_resp.split('__csrf=')[1].split(';')[0]
+
+# user_token = 'fakefakefake'
+
+input("token = %s" % user_token)
+
+
+# print(personal_fm().content.decode())
+# input()
 
 playlist_name = input("请输入要创建的新歌单名 >>>")
 
-resp = create_playlist(
-    playlist_name, user_token)
+bot = NCloudBot()
+bot.method = 'CREATE_LIST'
+bot.params = {"csrf_token": user_token}
+bot.data = {"name": str(playlist_name), "csrf_token": ""}
+bot.send()
+print(bot.response.content.decode())
 
 print(resp)

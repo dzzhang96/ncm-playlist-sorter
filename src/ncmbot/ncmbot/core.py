@@ -27,8 +27,29 @@ __all__ = [
     'NCloudBot', 'Response', 'login', 'user_play_list', 'user_dj', 'search',
     'user_follows', 'user_followeds', 'user_event', 'event',
     'top_playlist_highquality', 'play_list_detail', 'music_url', 'lyric',
-    'music_comment', 'song_detail', 'personal_fm', 'user_record', 'create_playlist', 'add_song'
+    'music_comment', 'song_detail', 'personal_fm', 'user_record', 'add_song'
 ]
+
+
+def make_cookie(self, name, value):
+    return http.cookiejar.Cookie(
+        version=0,
+        name=name,
+        value=value,
+        port=None,
+        port_specified=False,
+        domain="music.163.com",
+        domain_specified=True,
+        domain_initial_dot=False,
+        path="/",
+        path_specified=True,
+        secure=False,
+        expires=None,
+        discard=False,
+        comment=None,
+        comment_url=None,
+        rest=None,
+    )
 
 
 class NCloudBot(object):
@@ -117,6 +138,8 @@ class NCloudBot(object):
             'keep-alive',
             'Content-Type':
             'application/x-www-form-urlencoded',
+            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.2.1;",
+            'Origin': 'https://music.163.com',
             'Referer':
             'http://music.163.com',
             'Host':
@@ -131,8 +154,7 @@ class NCloudBot(object):
         headers = {
             'Referer':
             self.__NETEAST_HOST,
-            'Cookie':
-            'appver=2.0.2;',
+            'Cookie': "os=uwp; osver=10.0.10586.318; appver=1.2.1;",
             'Content-Type':
             'application/x-www-form-urlencoded',
             'User-Agent':
@@ -146,10 +168,12 @@ class NCloudBot(object):
         """Build internal Response object from given response."""
         # rememberLogin
         # if self.method is 'LOGIN' and resp.json().get('code') == 200:
-        #     cookiesJar.save_cookies(resp, NCloudBot.username)
+        #    cookiesJar.save_cookies(resp, NCloudBot.username)
         self.response.content = resp.content
         self.response.status_code = resp.status_code
         self.response.headers = resp.headers
+        # if dict(resp.headers).haskey('set-cookie'):
+        #     self.req.cookies = dict(resp.headers)['set-cookie']
 
     def send(self):
         """Sens the request."""
@@ -187,9 +211,12 @@ class NCloudBot(object):
                     resp = req.get(_url)
                 else:
                     resp = req.post(_url, data=data)
-                    # print("Posted data:")
-                    # print(data)
+                    print("Posted data:")
+                    print(self.data)
                 print("url = " + _url)
+                # print("Cookies are:")
+                # print(self.req.cookies.values)
+                # input()
                 self._build_response(resp)
                 self.response.ok = True
         except Exception as why:
@@ -247,16 +274,14 @@ def login(password, phone=None, email=None, rememberLogin=True):
     md5.update(password.encode('utf8'))
     password = md5.hexdigest()
     print(password)
-    r.data = {'password': password, 'rememberLogin': rememberLogin}
-    if phone is not None:
-        r.data['phone'] = phone
-        # r.method = 'LOGIN'
-    else:
-        r.data['username'] = email
-        # r.method = 'EMAIL_LOGIN'
+    r.data = {'phone': phone, 'password': password, 'rememberLogin': rememberLogin,
+              'clientToken': "1_jVUMqWEPke0/1/Vu56xCmJpo5vP1grjn_SOVVDzOc78w8OKLVZ2JH7IfkjSXqgfmh"}
+
+    # r.data['phone'] = phone
+
     r.send()
 
-    return r.response
+    return r, r.response
 
 
 def user_play_list(uid, offset=0, limit=1000):
@@ -524,15 +549,6 @@ def personal_fm():
     r = NCloudBot()
     r.method = 'PERSONAL_FM'
     r.data = {"csrf_token": ""}
-    r.send()
-    return r.response
-
-
-def create_playlist(name, token):
-    r = NCloudBot()
-    r.method = 'CREATE_LIST'
-    r.params = {"csrf_token": str(token)}
-    r.data = {"name": str(name), "csrf_token": str(token)}
     r.send()
     return r.response
 
