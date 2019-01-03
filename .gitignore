@@ -8,8 +8,6 @@ __pycache__/
 .AppleDouble
 .LSOverride
 
-# Image Files
-*.png
 
 # C extensions
 *.so
