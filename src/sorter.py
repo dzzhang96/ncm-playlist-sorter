@@ -2,6 +2,10 @@
 from song import Song
 from PIL import Image, ImageDraw2, ImageFont
 from MusicBoxApi import api as NetEaseApi
+from ncmbot.ncmbot import *
+
+import json
+import os
 
 
 buf_image = Image.new('RGB', (1024, 60), color='white')
@@ -13,7 +17,7 @@ padding = 9
 safe_ratio = 1.4
 
 font_name = input(
-    "请输入用于判定的字体名称：Windows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti >>> ")
+    "请输入用于判定的字体名称：Windows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti >>>")
 if len(font_name) == 0:
     font_name = "PingFang"
 font = ImageDraw2.Font('black', font_name, 60)
@@ -75,10 +79,34 @@ for i in range(0, len(playlist)):
                      results[2 * i + 1], font=font_small)
 
     result_draw.line((padding * 5, padding + 130 * i + 120),
-                      (frame_width, padding + 130 * i + 120), 'gray')
+                     (frame_width, padding + 130 * i + 120), 'gray')
 
 
 result_image.show()
 
-file_name = input("输入文件名来保存 PNG 文件 >>>")
-result_image.save("%s.png" % file_name)
+# file_name = input("输入文件名来保存 PNG 文件 >>>")
+# result_image.save("%s.png" % file_name)
+
+login_name = input("输入手机号或 Email 来登录 >>>")
+login_password = input("输入密码 >>>")
+
+if '@' in login_name:
+    bot = login(login_password, email=login_name)
+else:
+    bot = login(login_password, phone=login_name)
+
+# print(bot.content.decode())
+
+login_resp = json.loads(str(bot.content.decode()))
+
+user_token = json.loads(login_resp['bindings'][1]['tokenJsonStr'])[
+    'openid'].lower()
+input(user_token)
+
+
+playlist_name = input("请输入要创建的新歌单名 >>>")
+
+resp = create_playlist(
+    playlist_name, user_token)
+
+print(resp)
