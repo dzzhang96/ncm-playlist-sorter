@@ -7,7 +7,7 @@
 
 # 依赖
 ``` bash
-pip[3] install PIL MusicBoxApi
+pip[3] install -r requirements.txt
 ```
 
 # 用法
