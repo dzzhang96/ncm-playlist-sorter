@@ -1,5 +1,9 @@
 # ncm-playlist-sorter
+
+![](https://img.shields.io/badge/python-3.x-blue.svg)
+
 把网易云的歌单按歌名长度精确排序。
+
 
 > 大概像这样
 
