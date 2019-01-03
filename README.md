@@ -48,5 +48,7 @@ python[3] src/sorter.py
 
 * [NetEaseMusicApi](https://github.com/littlecodersh/NetEaseMusicApi), The MIT License
 
+* [ncmbot](https://github.com/xiyouMc/ncmbot), The ISC License
+
 # 哎
 大概只有自己用得到
