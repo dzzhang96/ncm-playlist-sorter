@@ -16,7 +16,11 @@ pip[3] install PIL MusicBoxApi
 * 获取歌单链接（ID），如图
 ![](https://raw.githubusercontent.com/yuxiqian/ncm-playlist-sorter/master/img/img02.png)
 
-* 运行 src/sorter.py，按提示操作即可
+* 运行
+``` bash
+python[3] src/sorter.py
+```
+
 ![](https://raw.githubusercontent.com/yuxiqian/ncm-playlist-sorter/master/img/img03.png)
 
 * 瞩目：需要输入网易云音乐**账号和密码**。
@@ -29,3 +33,13 @@ pip[3] install PIL MusicBoxApi
 不同的非等宽字体也可能会有细微的比例差别。
 
 因此如果有极度强迫需要，可以按照所需平台所使用的字体在第一步中自定义字体。
+
+# 致谢
+
+* [PIL](https://github.com/python-pillow/Pillow), The Open Source PIL Software License
+
+* [MusicBoxApi](https://github.com/wzpan/MusicBoxApi), The MIT License
+
+* [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi), The MIT License
+
+* [NetEaseMusicApi](https://github.com/littlecodersh/NetEaseMusicApi), The MIT License
