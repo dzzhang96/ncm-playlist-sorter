@@ -43,3 +43,6 @@ python[3] src/sorter.py
 * [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi), The MIT License
 
 * [NetEaseMusicApi](https://github.com/littlecodersh/NetEaseMusicApi), The MIT License
+
+# 哎
+大概只有自己用得到
