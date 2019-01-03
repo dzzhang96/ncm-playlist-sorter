@@ -4,8 +4,13 @@ from PIL import Image, ImageDraw2, ImageFont
 from MusicBoxApi import api as NetEaseApi
 from ncmbot.ncmbot import *
 
-import json
 import os
+import json
+import platform
+
+
+def separator():
+    print("-" * os.get_terminal_size().columns)
 
 
 buf_image = Image.new('RGB', (1024, 60), color='white')
@@ -16,10 +21,16 @@ playlist = []
 padding = 9
 safe_ratio = 1.4
 
+separator()
 font_name = input(
-    "请输入用于判定的字体名称：\nWindows 建议 MSYH 或 Arial，macOS 建议 PingFang 或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n>>>")
+    "请输入用于判定的字体名称：\nWindows 建议 MSYH（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
 if len(font_name) == 0:
-    font_name = "PingFang"
+    sysstr = platform.system()
+    if sysstr == "Windows":
+        font_name = "MSYH"
+    else:
+        font_name = "PingFang"
+
 font = ImageDraw2.Font('black', font_name, 60)
 font_small = ImageDraw2.Font('black', font_name, 30)
 
@@ -34,6 +45,7 @@ def get_pixel_width(string):
     return 0
 
 
+separator()
 id = input("请输入歌单 ID 或 URL >>>").replace(
     "https://music.163.com/#/playlist?id=", "").replace("https://music.163.com/#/my/m/music/playlist?id=", "")
 
@@ -65,6 +77,7 @@ for item in playlist:
     # if item.name_size > max_width:
     #     max_width = item.name_size
 
+separator()
 controller = input("歌曲数目: %d。按回车来登录网易云账号并进行同步。输入 I/i 来倒序排列歌曲。" % len(playlist))
 
 if controller != 'I' and controller != 'i':
@@ -97,6 +110,7 @@ trackIdString = '[' + ', '.join(track_ids) + ']'
 # file_name = input("输入文件名来保存 PNG 文件 >>>")
 # result_image.save("%s.png" % file_name)
 
+separator()
 login_name = input("输入手机号码来登录 >>>")
 login_password = input("输入密码 >>>")
 
@@ -122,6 +136,7 @@ user_token = login_resp.split('__csrf=')[1].split(';')[0]
 # print(personal_fm().content.decode())
 # input()
 
+separator()
 playlist_name = input("请输入要创建的新歌单名 >>>")
 
 # input(MUSIC_U)
@@ -133,6 +148,7 @@ bot.send()
 
 result = json.loads(bot.response.content.decode())
 
+separator()
 if result['code'] != 200:
     print("创建歌单失败。")
     exit(1)

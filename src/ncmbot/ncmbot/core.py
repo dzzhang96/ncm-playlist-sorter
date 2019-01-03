@@ -259,7 +259,7 @@ def login(password, phone=None, email=None, rememberLogin=True):
     md5 = hashlib.md5()
     md5.update(password.encode('utf8'))
     password = md5.hexdigest()
-    print(password)
+    # print(password)
     r.data = {'phone': phone, 'password': password, 'rememberLogin': rememberLogin,
               'clientToken': "1_jVUMqWEPke0/1/Vu56xCmJpo5vP1grjn_SOVVDzOc78w8OKLVZ2JH7IfkjSXqgfmh"}
 
