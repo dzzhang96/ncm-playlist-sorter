@@ -11,7 +11,6 @@
 
 # 依赖
 ``` bash
-pip[3] install pillow MusicBoxApi
 pip[3] install -r requirements.txt
 ```
 
