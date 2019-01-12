@@ -23,11 +23,11 @@ safe_ratio = 1.4
 
 separator()
 font_name = input(
-    "请输入用于判定的字体名称：\nWindows 建议 MSYH（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
+    "请输入用于判定的字体名称：\nWindows 建议 msyh.ttc（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
 if len(font_name) == 0:
     sysstr = platform.system()
     if sysstr == "Windows":
-        font_name = "MSYH"
+        font_name = "msyh.ttc"
     else:
         font_name = "PingFang"
 
