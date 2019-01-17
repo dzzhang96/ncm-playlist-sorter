@@ -32,23 +32,24 @@ python[3] src/sorter.py
 # 字形问题
 网易云音乐各平台客户端界面显示字体不一，但大部分是[非等宽字体](https://zh.wikipedia.org/wiki/比例字体)。
 
-因此如果简单按一个汉字=两个西文字母的计算方法并不能得到很好的结果。
+因此如果简单按一个汉字 = 两个西文字母的计算方法并不能得到很好的结果。
 
 不同的非等宽字体也可能会有细微的比例差别。
 
-因此如果有极度强迫需要，可以按照所需平台所使用的字体在第一步中自定义字体。
+因此如果有需要，可以按照所需平台所使用的字体在第一步中自定义字体。
 
 # 致谢
 
-* [PIL](https://github.com/python-pillow/Pillow), The Open Source PIL Software License
+* [ncmbot](https://github.com/xiyouMc/ncmbot), The ISC License
+
+* [Pillow](https://github.com/python-pillow/Pillow), The Open Source PIL Software License
 
 * [MusicBoxApi](https://github.com/wzpan/MusicBoxApi), The MIT License
 
-* [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi), The MIT License
-
 * [NetEaseMusicApi](https://github.com/littlecodersh/NetEaseMusicApi), The MIT License
 
-* [ncmbot](https://github.com/xiyouMc/ncmbot), The ISC License
+* [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi), The MIT License
 
-# 哎
+
+# （叹气）
 大概只有自己用得到
