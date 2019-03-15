@@ -28,7 +28,7 @@ import random
 import base64
 import binascii
 import sys
-import Crypto
+import crypto
 
 try:
     from Crypto.Cipher import AES
