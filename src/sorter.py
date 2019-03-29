@@ -6,6 +6,7 @@ from ncmbot.ncmbot import *
 
 import os
 import json
+import getpass
 import platform
 
 
@@ -23,13 +24,15 @@ safe_ratio = 1.4
 
 separator()
 font_name = input(
-    "请输入用于判定的字体名称：\nWindows 建议 msyh.ttc（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
+    "请输入用于判定的字体名称：\nWindows 建议 msyh.ttc（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti，Linux 建议思源体系列\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
 if len(font_name) == 0:
     sysstr = platform.system()
     if sysstr == "Windows":
         font_name = "msyh.ttc"
-    else:
+    elif sysstr == "Darwin":
         font_name = "PingFang"
+    else:
+        font_name = "FreeSans"
 
 font = ImageDraw2.Font('black', font_name, 60)
 font_small = ImageDraw2.Font('black', font_name, 30)
@@ -112,7 +115,7 @@ trackIdString = '[' + ', '.join(track_ids) + ']'
 
 separator()
 login_name = input("输入手机号码来登录 >>>")
-login_password = input("输入密码 >>>")
+login_password = getpass.getpass("输入密码 >>>")
 
 # if '@' in login_name:
 #     bot, resp = login(login_password, email=login_name)

@@ -1,5 +1,6 @@
-future==0.17.1
 requests==2.20.0
-pycrypto==2.6.1
+
+future==0.17.1
+pycryptodome~=3.7
 Pillow==5.4.1
 beautifulsoup4==4.7.1

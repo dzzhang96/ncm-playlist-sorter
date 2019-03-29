@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
+
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+
 from . import logger
 from .utils import notify
 from .storage import Storage
@@ -22,10 +28,6 @@ import re
 '''
 网易云音乐 Api
 '''
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 from builtins import chr
 from builtins import int
 from builtins import map
@@ -35,11 +37,6 @@ from builtins import str
 from builtins import pow
 from future import standard_library
 standard_library.install_aliases()
-
-try:
-    import crypto
-except:
-    pass
 
 try:
     from Crypto.Cipher import AES
