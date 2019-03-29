@@ -2,6 +2,23 @@
 # -*- coding: utf-8 -*-
 # @Author: omi
 # @Date:   2014-08-24 21:51:57
+from . import logger
+from .utils import notify
+from .storage import Storage
+from .config import Config
+import requests
+from bs4 import BeautifulSoup
+from http.cookiejar import LWPCookieJar
+from Crypto.Cipher import AES
+import sys
+import binascii
+import base64
+import random
+import hashlib
+import time
+import json
+import os
+import re
 '''
 网易云音乐 Api
 '''
@@ -19,16 +36,10 @@ from builtins import pow
 from future import standard_library
 standard_library.install_aliases()
 
-import re
-import os
-import json
-import time
-import hashlib
-import random
-import base64
-import binascii
-import sys
-import crypto
+try:
+    import crypto
+except:
+    pass
 
 try:
     from Crypto.Cipher import AES
@@ -36,15 +47,6 @@ except:
     sys.modules['Crypto'] = crypto
     from Crypto.Cipher import AES
 
-from Crypto.Cipher import AES
-from http.cookiejar import LWPCookieJar
-from bs4 import BeautifulSoup
-import requests
-
-from .config import Config
-from .storage import Storage
-from .utils import notify
-from . import logger
 
 # 歌曲榜单地址
 top_list_all = {
@@ -122,7 +124,8 @@ def aesEncrypt(text, secKey):
 
 def rsaEncrypt(text, pubKey, modulus):
     text = text[::-1]
-    rs = pow(int(binascii.hexlify(text), 16), int(pubKey, 16), int(modulus, 16))
+    rs = pow(int(binascii.hexlify(text), 16),
+             int(pubKey, 16), int(modulus, 16))
     return format(rs, 'x').zfill(256)
 
 
@@ -231,7 +234,8 @@ class NetEase(object):
                     callback=None,
                     timeout=None):
         connection = json.loads(
-            self.rawHttpRequest(method, action, query, urlencoded, callback, timeout)
+            self.rawHttpRequest(method, action, query,
+                                urlencoded, callback, timeout)
         )
         return connection
 
@@ -615,7 +619,8 @@ class NetEase(object):
                 channelids[i])
             try:
                 data = self.httpRequest('GET', action)
-                channel = self.dig_info(data['program']['mainSong'], 'channels')
+                channel = self.dig_info(
+                    data['program']['mainSong'], 'channels')
                 channels.append(channel)
             except requests.exceptions.RequestException as e:
                 log.error(e)
@@ -666,8 +671,6 @@ class NetEase(object):
                     song_info['artist'] = '未知艺术家'
 
                 temp.append(song_info)
-
-
 
         elif dig_type == 'artists':
             artists = []
@@ -724,7 +727,6 @@ class NetEase(object):
             log.debug(data)
             temp = self.playlist_class_dict[data]
 
-
         elif dig_type == 'user_songs':
             for i in range(0, len(data)):
                 url, quality = geturl_new_api(data[i])
@@ -736,7 +738,6 @@ class NetEase(object):
                     'quality': quality,
                 }
                 temp.append(song_info)
- 
 
         return temp
 
@@ -746,4 +747,5 @@ if __name__ == '__main__':
     print(geturl_new_api(ne.songs_detail([27902910])[0]))  # MD 128k, fallback
     print(ne.songs_detail_new_api([27902910])[0]['url'])
     print(ne.songs_detail([405079776])[0]['mp3Url'])  # old api
-    print(requests.get(ne.songs_detail([405079776])[0]['mp3Url']).status_code)  # 404
+    print(requests.get(ne.songs_detail([405079776])[
+          0]['mp3Url']).status_code)  # 404
