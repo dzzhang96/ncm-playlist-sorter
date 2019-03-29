@@ -42,6 +42,8 @@ python[3] src/sorter.py
 
 * [ncmbot](https://github.com/xiyouMc/ncmbot), The ISC License
 
+* [pycryptodome](https://github.com/Legrandin/pycryptodome), The BSD 2-Clause license
+
 * [Pillow](https://github.com/python-pillow/Pillow), The Open Source PIL Software License
 
 * [MusicBoxApi](https://github.com/wzpan/MusicBoxApi), The MIT License
