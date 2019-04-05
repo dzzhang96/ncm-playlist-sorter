@@ -22,4 +22,4 @@ python3 src/sorter.py
 deactivate
 
 # Remove environment
-rm -rf venv
+rm -rf /venv

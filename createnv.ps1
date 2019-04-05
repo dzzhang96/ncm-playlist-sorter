@@ -1,3 +1,5 @@
+$Env:PY_PYTHON = 3
+
 # Install virtualenv package
 pip install virtualenv
 
@@ -20,4 +22,4 @@ python src/sorter.py
 deactivate
 
 # Remove environment
-rmdir ../venv
+rmdir /venv
