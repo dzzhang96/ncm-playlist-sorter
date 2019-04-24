@@ -1,5 +1,12 @@
 #!/usr/bin/env bash 
 
+# File:           './createnv.sh'
+# Author:         'yuxiqian' <akaza_akari@sjtu.edu.cn>
+# Description:    Creates an virtual python environment
+#                 and executes the playlist sorter. 
+# Last ModTime:   2019/4/24
+
+
 # Install virtualenv package
 pip3 install virtualenv
 

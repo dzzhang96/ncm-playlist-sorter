@@ -1,3 +1,11 @@
+$_ = """
+    File:           './createnv.ps1'
+    Author:         'yuxiqian' <akaza_akari@sjtu.edu.cn>
+    Description:    Creates an virtual python environment
+                    and executes the playlist sorter. 
+    Last ModTime:   2019/4/24
+    """
+
 $Env:PY_PYTHON = 3
 
 # Install virtualenv package
