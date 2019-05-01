@@ -1,6 +1,7 @@
-# ncm-playlist-sorter
+# ncm-playlist-sorter · [![Build Status](https://travis-ci.com/yuxiqian/ncm-playlist-sorter.svg?branch=master)](https://travis-ci.com/yuxiqian/ncm-playlist-sorter)
 
-![](https://img.shields.io/badge/python-3.x-blue.svg)
+![GitHub](https://img.shields.io/github/license/yuxiqian/ncm-playlist-sorter.svg)
+![Python version](https://img.shields.io/badge/python-3.x-blue.svg)
 
 把网易云的歌单按歌名长度精确排序。
 
