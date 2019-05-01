@@ -11,7 +11,10 @@ import platform
 
 
 def separator():
-    print("-" * os.get_terminal_size().columns)
+    try:
+        print("-" * os.get_terminal_size().columns)
+    except OSError:
+        print("-" * 17)
 
 
 buf_image = Image.new('RGB', (1024, 60), color='white')
@@ -34,8 +37,13 @@ if len(font_name) == 0:
     else:
         font_name = "FreeSans"
 
-font = ImageDraw2.Font('black', font_name, 60)
-font_small = ImageDraw2.Font('black', font_name, 30)
+
+try:
+    font = ImageDraw2.Font('black', font_name, 60)
+    font_small = ImageDraw2.Font('black', font_name, 30)
+except:
+    print('%s 不是合法的字体文件。' % font_name)
+    exit(0)
 
 
 def get_pixel_width(string):
@@ -52,7 +60,12 @@ separator()
 id = input("请输入歌单 ID 或 URL >>>").replace(
     "https://music.163.com/#/playlist?id=", "").replace("https://music.163.com/#/my/m/music/playlist?id=", "")
 
-datalist = netease.playlist_detail(id)
+
+try:
+    datalist = netease.playlist_detail(id)
+except:
+    print('%s 不是合法的歌单 ID。' % id)
+    exit(0)
 
 for song in datalist:
     new_song = Song()
@@ -115,6 +128,10 @@ trackIdString = '[' + ', '.join(track_ids) + ']'
 
 separator()
 login_name = input("输入手机号码来登录 >>>")
+if len(login_name) != 11:
+    print('%s 不是合法的手机号码。' % login_name)
+    exit(0)
+
 login_password = getpass.getpass("输入密码 >>>")
 
 # if '@' in login_name:
