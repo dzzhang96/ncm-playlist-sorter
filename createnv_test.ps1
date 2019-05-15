@@ -1,9 +1,9 @@
 """
-    File:           './createnv.ps1'
-    Author:         'yuxiqian' <akaza_akari@sjtu.edu.cn>
-    Description:    Creates an virtual python environment
+    File:           './createnv_test.ps1'
+    Author:         'yuetsin'
+    Description:    For CI tests only. Creates an virtual python environment
                     and executes the playlist sorter. 
-    Last ModTime:   2019/4/24
+    Last ModTime:   2019/5/12
 """
 
 $Env:PY_PYTHON = 3
