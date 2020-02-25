@@ -27,7 +27,14 @@ safe_ratio = 1.4
 
 separator()
 font_name = input(
-    "请输入用于判定的字体名称：\nWindows 建议 msyh.ttc（默认）或 Arial，macOS 建议 PingFang（默认）或 Songti，Linux 建议思源体系列\n为了显示效果考虑，请尽量选择非等宽字体\n按回车选择默认值 >>>")
+    """请输入用于判定的字体名称：
+    Windows 建议 msyh.ttc（默认）或 Arial。
+    macOS 建议 PingFang（默认）或 Songti。
+    Linux 建议思源体系列。
+为了显示效果考虑，请尽量选择非等宽字体。
+直接按 Enter 来选择默认值
+>>> """)
+
 if len(font_name) == 0:
     sysstr = platform.system()
     if sysstr == "Windows":
@@ -42,8 +49,8 @@ try:
     font = ImageDraw2.Font('black', font_name, 60)
     font_small = ImageDraw2.Font('black', font_name, 30)
 except:
-    print('%s 不是合法的字体文件。' % font_name)
-    exit(0)
+    print('%s 不是可用的字体文件。' % font_name)
+    exit(-1)
 
 
 def get_pixel_width(string):
@@ -57,15 +64,15 @@ def get_pixel_width(string):
 
 
 separator()
-id = input("请输入歌单 ID 或 URL >>>").replace(
+id = input("请输入歌单 ID 或 URL…\n>>> ").replace(
     "https://music.163.com/#/playlist?id=", "").replace("https://music.163.com/#/my/m/music/playlist?id=", "")
 
 
 try:
     datalist = netease.playlist_detail(id)
 except:
-    print('%s 不是合法的歌单 ID。' % id)
-    exit(0)
+    print('%s 不是可用的歌单 ID。' % id)
+    exit(-2)
 
 for song in datalist:
     new_song = Song()
@@ -94,7 +101,8 @@ for item in playlist:
     #     max_width = item.name_size
 
 separator()
-controller = input("歌曲数目: %d。按回车来登录网易云账号并进行同步。输入 I/i 来倒序排列歌曲。" % len(playlist))
+controller = input(
+    "歌曲数目: %d。\n按回车来登录网易云账号并进行同步。输入 I/i 来倒序排列歌曲。" % len(playlist))
 
 if controller != 'I' and controller != 'i':
     playlist.reverse()
@@ -127,23 +135,38 @@ trackIdString = '[' + ', '.join(track_ids) + ']'
 # result_image.save("%s.png" % file_name)
 
 separator()
-login_name = input("输入手机号码来登录 >>>")
-if len(login_name) != 11:
-    print('%s 不是合法的手机号码。' % login_name)
-    exit(0)
 
-login_password = getpass.getpass("输入密码 >>>")
+while True:
+    try:
+        option = int(
+            input("想要如何登录到网易云音乐？\n\t1 - 用账号和密码\n\t2 - 用 HTTP Cookie\n>>> "))
+    except:
+        continue
+    if option == 1:
+        separator()
+        login_name = input("输入手机号码…\n>>> ")
+        # if len(login_name) != 11:
+        #     print('%s 不是合法的手机号码。' % login_name)
+        #     exit(-2)
 
-# if '@' in login_name:
-#     bot, resp = login(login_password, email=login_name)
-# else:
-bot, resp = login(login_password, phone=login_name)
+        login_password = getpass.getpass("输入密码…\n>>> ")
 
+        # if '@' in login_name:
+        #     bot, resp = login(login_password, email=login_name)
+        # else:
+        bot, resp = login(login_password, phone=login_name)
 
-# print(json.dumps(dict(resp.headers)))
-# print(resp.content.decode())
+        # print(json.dumps(dict(resp.headers)))
+        # print(resp.content.decode())
 
-login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
+        login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
+        break
+    elif option == 2:
+        separator()
+        cookie_content = input("输入 Cookie 内容…\n>>> \n")
+        login_resp = cookie_content
+        break
+
 MUSIC_U = login_resp.split('MUSIC_U=')[1].split(';')[0]
 
 
@@ -157,7 +180,7 @@ user_token = login_resp.split('__csrf=')[1].split(';')[0]
 # input()
 
 separator()
-playlist_name = input("请输入要创建的新歌单名 >>>")
+playlist_name = input("请输入要创建的新歌单名…\n>>> ")
 
 # input(MUSIC_U)
 bot = NCloudBot(MUSIC_U)
@@ -171,19 +194,28 @@ result = json.loads(bot.response.content.decode())
 separator()
 if result['code'] != 200:
     print("创建歌单失败。")
-    exit(1)
+    exit(-3)
+
+# separator()
+# print(result)
+
+# separator()
 
 new_playlist_id = result['id']
 
 final_result = add_song(str(new_playlist_id), trackIdString, MUSIC_U)
+
+# print(final_result.content.decode())
+# separator()
 
 final_response = json.loads(final_result.content.decode())['code']
 
 # print(resp)
 
 if final_response == 200:
-    print("成功！")
+    print("成功！\n现在应该可以在\n https://music.163.com/#/playlist?id=%s \n访问新歌单了。" %
+          new_playlist_id)
     exit(0)
 else:
-    print("哪里不太对的样子")
-    exit(-1)
+    print("往歌单中添加歌曲失败…")
+    exit(-4)
