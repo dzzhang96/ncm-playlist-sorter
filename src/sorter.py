@@ -64,13 +64,13 @@ def get_pixel_width(string):
 
 
 separator()
-playlist_id = input("请输入歌单 ID 或 URL…\n>>> ").split('&userid=')[0]       \
-    .replace("https://music.163.com/#/playlist?id=", "")                    \
-    .replace("https://music.163.com/#/my/m/music/playlist?id=", "")         \
-    .replace("https://music.163.com/playlist?id=", "")
 
 
 try:
+    playlist_id = input("请输入歌单 ID 或 URL…\n>>> ").split('&userid=')[0]       \
+        .replace("https://music.163.com/#/playlist?id=", "")                    \
+        .replace("https://music.163.com/#/my/m/music/playlist?id=", "")         \
+        .replace("https://music.163.com/playlist?id=", "")
     datalist = netease.playlist_detail(playlist_id)
 except:
     print('%s 不是可用的歌单 ID。' % playlist_id)
@@ -78,11 +78,15 @@ except:
 
 separator()
 
-sort_by = input("""想要依照哪个字段进行排序？
-    n - 依照歌曲名称（Name）进行排序（默认）
-    a - 依照专辑名称（Album）进行排序
-    r - 依照艺术家（aRtist）进行排序
-""").lower()[0]
+try:
+    sort_by = input("""想要依照哪个字段进行排序？
+\tn - 依照歌曲名称（Name）进行排序（默认）
+\ta - 依照专辑名称（Album）进行排序
+\tr - 依照艺术家（aRtist）进行排序
+>>> """).lower()[0]
+except:
+    print('解析输入失败。')
+    exit(-3)
 
 
 for song in datalist:
@@ -119,7 +123,7 @@ track_ids = []
 
 separator()
 controller = input(
-    "处理了 %d 首歌。\n按回车来登录「网易云音乐」账号并进行同步。或者，在此之前输入 i 来从长到短地排列歌曲。" % len(playlist))
+    "处理了 %d 首歌。\n按回车来登录「网易云音乐」账号并进行同步。或者，在此之前输入 i 来从长到短地排列歌曲。\n>>> " % len(playlist))
 
 if controller != 'I' and controller != 'i':
     playlist.reverse()
@@ -148,7 +152,7 @@ trackIdString = '[' + ', '.join(track_ids) + ']'
 
 # result_image.show()
 
-# file_name = input("输入文件名来保存 PNG 文件 >>>")
+# file_name = input("输入文件名来保存 PNG 文件 >>> ")
 # result_image.save("%s.png" % file_name)
 
 separator()
@@ -211,7 +215,7 @@ result = json.loads(bot.response.content.decode())
 separator()
 if result['code'] != 200:
     print("创建歌单失败。")
-    exit(-3)
+    exit(-4)
 
 # separator()
 # print(result)
@@ -235,4 +239,4 @@ if final_response == 200:
     exit(0)
 else:
     print("往歌单中添加歌曲失败…")
-    exit(-4)
+    exit(-5)
