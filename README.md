@@ -3,9 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/yuetsin/ncm-playlist-sorter.svg)
 ![Python version](https://img.shields.io/badge/python-3.x-blue.svg)
 
-谢谢[yuetsin](https://github.com/yuetsin)的代码！增加可以将歌单按专辑名称/艺术家名称（非长度）排序。
-
-
+谢谢[yuetsin](https://github.com/yuetsin)的代码！增加可以将歌单按专辑名称/艺术家名称（按首字母，非长度）排序。
 
 以下是原readme：
 
