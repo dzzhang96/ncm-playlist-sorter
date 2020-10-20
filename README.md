@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/yuetsin/ncm-playlist-sorter.svg)
 ![Python version](https://img.shields.io/badge/python-3.x-blue.svg)
 
-把网易云的歌单按歌名长度精确排序。
+把「网易云音乐」歌单依显示长度排序。
 
 
 > 大概像这样

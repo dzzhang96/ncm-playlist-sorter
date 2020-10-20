@@ -64,15 +64,26 @@ def get_pixel_width(string):
 
 
 separator()
-id = input("请输入歌单 ID 或 URL…\n>>> ").replace(
-    "https://music.163.com/#/playlist?id=", "").replace("https://music.163.com/#/my/m/music/playlist?id=", "")
+playlist_id = input("请输入歌单 ID 或 URL…\n>>> ").split('&userid=')[0]       \
+    .replace("https://music.163.com/#/playlist?id=", "")                    \
+    .replace("https://music.163.com/#/my/m/music/playlist?id=", "")         \
+    .replace("https://music.163.com/playlist?id=", "")
 
 
 try:
-    datalist = netease.playlist_detail(id)
+    datalist = netease.playlist_detail(playlist_id)
 except:
-    print('%s 不是可用的歌单 ID。' % id)
+    print('%s 不是可用的歌单 ID。' % playlist_id)
     exit(-2)
+
+separator()
+
+sort_by = input("""想要依照哪个字段进行排序？
+    n - 依照歌曲名称（Name）进行排序（默认）
+    a - 依照专辑名称（Album）进行排序
+    r - 依照艺术家（aRtist）进行排序
+""").lower()[0]
+
 
 for song in datalist:
     new_song = Song()
@@ -84,8 +95,14 @@ for song in datalist:
     artists = []
     for artist in song["artists"]:
         artists.append(artist["name"])
-    new_song.artist = '/'.join(artists)
-    new_song.name_size = get_pixel_width(new_song.name)
+    new_song.artist = ' / '.join(artists)
+
+    if sort_by == 'a':
+        new_song.name_size = get_pixel_width(new_song.album)
+    elif sort_by == 'r':
+        new_song.name_size = get_pixel_width(new_song.artist)
+    else:
+        new_song.name_size = get_pixel_width(new_song.name)
     playlist.append(new_song)
 
 playlist.sort(key=lambda x: x.name_size)
@@ -93,16 +110,16 @@ playlist.sort(key=lambda x: x.name_size)
 track_ids = []
 
 
-for item in playlist:
-    print("歌曲名称 = %s, 相对长度 = %d" % (item.name, item.name_size))
-    # results.append(item.name)
-    # results.append("%s - %s\n" % (item.artist, item.album))
-    # if item.name_size > max_width:
-    #     max_width = item.name_size
+# for item in playlist:
+#     print("歌曲名称 = %s, 相对长度 = %d" % (item.name, item.name_size))
+# results.append(item.name)
+# results.append("%s - %s\n" % (item.artist, item.album))
+# if item.name_size > max_width:
+#     max_width = item.name_size
 
 separator()
 controller = input(
-    "歌曲数目: %d。\n按回车来登录网易云账号并进行同步。输入 I/i 来倒序排列歌曲。" % len(playlist))
+    "处理了 %d 首歌。\n按回车来登录「网易云音乐」账号并进行同步。或者，在此之前输入 i 来从长到短地排列歌曲。" % len(playlist))
 
 if controller != 'I' and controller != 'i':
     playlist.reverse()
