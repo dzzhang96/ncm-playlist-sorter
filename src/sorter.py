@@ -193,17 +193,18 @@ for song in datalist:
             new_song.artist = ''
 
         if sort_by == 'a':
-            new_song.name_size = get_pixel_width(new_song.album)
+            playlist.sort(key=lambda x: x.album)
         elif sort_by == 'r':
-            new_song.name_size = get_pixel_width(new_song.artist)
+            playlist.sort(key=lambda x: x.artist)
         else:
             new_song.name_size = get_pixel_width(new_song.name)
+            playlist.sort(key=lambda x: x.name_size)
         playlist.append(new_song)
     except:
         print("在解析 ID「%s」的歌曲时发生错误。已将其抛弃。" %
               str(new_song.id) if new_song.id else '不明')
 
-playlist.sort(key=lambda x: x.name_size)
+#playlist.sort(key=lambda x: x.name_size)
 
 track_ids = []
 
