@@ -8,6 +8,8 @@ import os
 import json
 import getpass
 import platform
+from math import ceil
+from time import sleep
 
 
 def separator():
@@ -17,10 +19,15 @@ def separator():
         print("-" * 17)
 
 
+# 请求歌单详细信息的尺寸大小
+# 过大会导致请求失败
+chunk_size = 100
+
 buf_image = Image.new('RGB', (1024, 60), color='white')
 buf_obj = ImageDraw2.Draw(buf_image)
 
 netease = NetEaseApi.NetEase()
+
 playlist = []
 padding = 9
 safe_ratio = 1.4
@@ -63,6 +70,50 @@ def get_pixel_width(string):
     return 0
 
 
+while True:
+    separator()
+    try:
+        option = int(
+            input("想要如何登录到网易云音乐？\n\t1 - 用账号和密码\n\t2 - 用 HTTP Cookie\n>>> "))
+    except KeyboardInterrupt:
+        exit(0)
+    except:
+        continue
+    if option == 1:
+        separator()
+        login_name = input("输入手机号码…\n>>> ")
+        # if len(login_name) != 11:
+        #     print('%s 不是合法的手机号码。' % login_name)
+        #     exit(-2)
+
+        login_password = getpass.getpass("以及密码…\n>>> ")
+
+        # if '@' in login_name:
+        #     bot, resp = login(login_password, email=login_name)
+        # else:
+        bot, resp = login(login_password, phone=login_name)
+
+        # print(json.dumps(dict(resp.headers)))
+        # print(resp.content.decode())
+
+        login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
+
+    elif option == 2:
+        separator()
+        cookie_content = input("输入 Cookie 内容…\n>>> \n")
+        login_resp = cookie_content
+
+    try:
+        MUSIC_U = login_resp.split('MUSIC_U=')[1].split(';')[0]
+        user_token = login_resp.split('__csrf=')[1].split(';')[0]
+
+        bot = NCloudBot(MUSIC_U)
+        break
+    except KeyboardInterrupt:
+        exit(0)
+    except:
+        print("发生问题。请再试一次。")
+
 separator()
 
 
@@ -71,11 +122,44 @@ try:
         .replace("https://music.163.com/#/playlist?id=", "")                    \
         .replace("https://music.163.com/#/my/m/music/playlist?id=", "")         \
         .replace("https://music.163.com/playlist?id=", "")
-    datalist = netease.playlist_detail(playlist_id)
+
+    bot.method = 'PLAY_LIST_DETAIL'
+    bot.params = {"csrf_token": user_token}
+    bot.data = {"id": playlist_id, "limit": 10000, "csrf_token": user_token}
+    bot.send()
+
+    trackids = json.loads(bot.response.content.decode())[
+        'playlist']['trackIds']
+
+    c = []
+    for song in trackids:
+        c.append({'id': song['id']})
+
+    datalist = []
+
+    for i in range(ceil(len(c) / chunk_size)):
+        part = c[i * chunk_size: min((i + 1) * chunk_size, len(c))]
+        bot.data = {'c': json.dumps(
+            part), 'ids': part, "csrf_token": user_token}
+        bot.method = 'SONG_DETAIL'
+        bot.send()
+
+        datalist += json.loads(bot.response.content.decode())['songs']
+
+        print('\r获取歌曲 %d 之 %d…' %
+              (min((i + 1) * chunk_size, len(c)), len(c)), end='')
+
+        sleep(1)
+
+    print()
+except KeyboardInterrupt:
+    exit(0)
 except:
-    print('%s 不是可用的歌单 ID。' % playlist_id)
+    print('请求 %s 失败。请检查歌单 ID 及网络连接。' % playlist_id)
     exit(-2)
 
+# print(datalist)
+# input()
 separator()
 
 try:
@@ -85,29 +169,39 @@ try:
 \tr - 依照艺术家（aRtist）进行排序
 >>> """).lower()[0]
 except:
-    print('解析输入失败。')
-    exit(-3)
+    sort_by = 'n'
 
 
 for song in datalist:
+
     new_song = Song()
     # print(song)
     # input()
-    new_song.name = song["name"]
-    new_song.album = song["album"]["name"]
-    new_song.id = song["id"]
-    artists = []
-    for artist in song["artists"]:
-        artists.append(artist["name"])
-    new_song.artist = ' / '.join(artists)
 
-    if sort_by == 'a':
-        new_song.name_size = get_pixel_width(new_song.album)
-    elif sort_by == 'r':
-        new_song.name_size = get_pixel_width(new_song.artist)
-    else:
-        new_song.name_size = get_pixel_width(new_song.name)
-    playlist.append(new_song)
+    try:
+        new_song.id = song["id"]
+        new_song.name = song["name"]
+        new_song.album = song["al"]["name"]
+        artists = []
+        if type(song["ar"]) == list:
+            for artist in song["ar"]:
+                artists.append(artist["name"])
+            new_song.artist = ' / '.join(artists)
+        elif type(song["ar"] == str):
+            new_song.artist = song["ar"]
+        else:
+            new_song.artist = ''
+
+        if sort_by == 'a':
+            new_song.name_size = get_pixel_width(new_song.album)
+        elif sort_by == 'r':
+            new_song.name_size = get_pixel_width(new_song.artist)
+        else:
+            new_song.name_size = get_pixel_width(new_song.name)
+        playlist.append(new_song)
+    except:
+        print("在解析 ID「%s」的歌曲时发生错误。已将其抛弃。" %
+              str(new_song.id) if new_song.id else '不明')
 
 playlist.sort(key=lambda x: x.name_size)
 
@@ -123,88 +217,16 @@ track_ids = []
 
 separator()
 controller = input(
-    "处理了 %d 首歌。\n按回车来登录「网易云音乐」账号并进行同步。或者，在此之前输入 i 来从长到短地排列歌曲。\n>>> " % len(playlist))
+    "处理了 %d 首歌。\n按回车来创建新歌单。或者，在此之前输入 i 来从长到短地排列歌曲。\n>>> " % len(playlist))
 
 if controller != 'I' and controller != 'i':
     playlist.reverse()
 
 
-for p in playlist:
-    track_ids.append(str(p.id))
-
-trackIdString = '[' + ', '.join(track_ids) + ']'
-
-# result_image = Image.new(
-#    'RGB', (1080, len(playlist) * (130)), color = "white")
-# result_draw = ImageDraw2.Draw(result_image)
-
-# frame_width = 1080
-
-# for i in range(0, len(playlist)):
-#    result_draw.text((padding * 5, padding + 130 * i),
-#                     results[2 * i], font=font)
-#    result_draw.text((padding * 5, padding + 130 * i + 80),
-#                     results[2 * i + 1], font=font_small)
-
-#    result_draw.line((padding * 5, padding + 130 * i + 120),
-#                     (frame_width, padding + 130 * i + 120), 'gray')
-
-
-# result_image.show()
-
-# file_name = input("输入文件名来保存 PNG 文件 >>> ")
-# result_image.save("%s.png" % file_name)
-
-separator()
-
-while True:
-    try:
-        option = int(
-            input("想要如何登录到网易云音乐？\n\t1 - 用账号和密码\n\t2 - 用 HTTP Cookie\n>>> "))
-    except:
-        continue
-    if option == 1:
-        separator()
-        login_name = input("输入手机号码…\n>>> ")
-        # if len(login_name) != 11:
-        #     print('%s 不是合法的手机号码。' % login_name)
-        #     exit(-2)
-
-        login_password = getpass.getpass("输入密码…\n>>> ")
-
-        # if '@' in login_name:
-        #     bot, resp = login(login_password, email=login_name)
-        # else:
-        bot, resp = login(login_password, phone=login_name)
-
-        # print(json.dumps(dict(resp.headers)))
-        # print(resp.content.decode())
-
-        login_resp = json.loads(json.dumps(dict(resp.headers)))['Set-Cookie']
-        break
-    elif option == 2:
-        separator()
-        cookie_content = input("输入 Cookie 内容…\n>>> \n")
-        login_resp = cookie_content
-        break
-
-MUSIC_U = login_resp.split('MUSIC_U=')[1].split(';')[0]
-
-
-user_token = login_resp.split('__csrf=')[1].split(';')[0]
-
-# user_token = 'fakefakefake'
-
-# input("token = %s" % user_token)
-
-# print(personal_fm().content.decode())
-# input()
-
 separator()
 playlist_name = input("请输入要创建的新歌单名…\n>>> ")
 
 # input(MUSIC_U)
-bot = NCloudBot(MUSIC_U)
 bot.method = 'CREATE_LIST'
 bot.params = {"csrf_token": user_token}
 bot.data = {"name": str(playlist_name), "csrf_token": user_token}
@@ -217,26 +239,48 @@ if result['code'] != 200:
     print("创建歌单失败。")
     exit(-4)
 
+new_playlist_id = result['id']
+sleep(0.5)
 # separator()
 # print(result)
 
 # separator()
 
-new_playlist_id = result['id']
 
-final_result = add_song(str(new_playlist_id), trackIdString, MUSIC_U)
+for p in playlist:
+    # print(repr(p.id))
+    track_ids.append(p.id)
+
+for i in range(ceil(len(track_ids) / chunk_size)):
+    song_chunk = track_ids[i *
+                           chunk_size: min((i + 1) * chunk_size, len(track_ids))]
+
+    bot.method = 'ADD_SONG'
+    bot.params = {"csrf_token": user_token}
+    bot.data = {"op": "add", "pid": new_playlist_id,
+                "trackIds": '[' + ','.join([str(v) for v in song_chunk]) + ']', "csrf_token": user_token}
+
+    # print(bot.data)
+    bot.send()
+
+    final_response = json.loads(bot.response.content.decode())
+    if final_response['code'] != 200:
+        print("\n往歌单中添加歌曲失败…")
+        print(final_response)
+        exit(-5)
+    else:
+        print('\r添加歌曲 %d 之 %d…' %
+              (min((i + 1) * chunk_size, len(c)), len(c)), end='')
+        sleep(1)
 
 # print(final_result.content.decode())
-# separator()
 
-final_response = json.loads(final_result.content.decode())['code']
+print()
+separator()
+
 
 # print(resp)
 
-if final_response == 200:
-    print("成功！\n现在应该可以在\n https://music.163.com/#/playlist?id=%s \n访问新歌单了。" %
-          new_playlist_id)
-    exit(0)
-else:
-    print("往歌单中添加歌曲失败…")
-    exit(-5)
+
+print("成功！\n现在应该可以在\n https://music.163.com/#/playlist?id=%s \n访问新歌单了。" %
+      new_playlist_id)

@@ -435,6 +435,18 @@ class NetEase(object):
     def playlist_class_detail(self):
         pass
 
+    # 歌单所有歌曲 ID
+    def playlist_trackids(self, playlist_id):
+        action = 'http://music.163.com/api/playlist/detail?id={}'.format(
+            playlist_id)
+        try:
+            data = self.httpRequest('GET', action)
+            print(data['result'])
+            return data['result']['trackids']
+        except requests.exceptions.RequestException as e:
+            log.error(e)
+            return []
+
     # 歌单详情
     def playlist_detail(self, playlist_id):
         action = 'http://music.163.com/api/playlist/detail?id={}'.format(
