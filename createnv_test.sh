@@ -23,7 +23,9 @@ source venv/bin/activate
 # Run Script
 cd ../
 pip3 install -r requirements.txt
-python3 src/sorter.py < resp.rb
+
+cd src
+python3 .test.py
 
 # Deactivate
 deactivate
